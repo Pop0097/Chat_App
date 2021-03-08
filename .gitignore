@@ -1,0 +1,2 @@
+.env
+./server/utils/password-hash.js
