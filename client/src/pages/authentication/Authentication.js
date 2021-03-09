@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import {Tabs, Tab} from 'react-bootstrap';
+import { withRouter } from 'react-router-dom';
 
 import Login from './login/Login';
 import Registration from './registration/Registration';
 
 import './Authentication.css';
 
-export default class Authentication extends Component {
+class Authentication extends Component {
     state = {
         loadingState: false
     }
@@ -38,3 +39,5 @@ export default class Authentication extends Component {
     );
     }
 }
+
+export default withRouter(Authentication);

@@ -6,10 +6,7 @@ import { DebounceInput } from 'react-debounce-input';
 import ChatHttpServer from '../../../utils/chatHttpServer';
 import './Registration.css';
 
-import * as axios from 'axios';
-
-
-export default class Registration extends Component {
+class Registration extends Component {
 
     constructor(props) {
         super(props);
@@ -30,8 +27,13 @@ export default class Registration extends Component {
         }
 
         this.props.loadingState(true);
-        const response = ChatHttpServer.register(this.state);
+        const response = await ChatHttpServer.register({
+            username: this.state.username,
+            password: this.state.password,
+        });
         this.props.loadingState(false);
+
+        console.log(response);
         
         if (response.error) {
             alert('Unable to reister. Please try again after some time.');
@@ -42,10 +44,8 @@ export default class Registration extends Component {
                 usernameAvailable: true,
             };
 
-            ChatHttpServer.setLS('userid', response.userId)
-                .then(() => {
-                    window.location = '/home';
-                });
+            ChatHttpServer.setLS('userid', response.userId);
+            this.props.history.push('/home');
         }
     }
 
@@ -125,3 +125,5 @@ export default class Registration extends Component {
         )
     }
 }
+
+export default withRouter(Registration);

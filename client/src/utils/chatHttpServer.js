@@ -42,6 +42,40 @@ class ChatHttpServer {
             }
         });
     }
+
+    login(userCredential) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const res = await axios.post('http://localhost:4000/login', userCredential);
+                resolve(res.data);
+            } catch (err) {
+                reject(err);
+            }
+        });
+    }
+
+    getUserId() {
+        return new Promise((resolve, reject) => {
+            try {
+                resolve(localStorage.getItem('userid'));
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
+
+    userSessionCheck(userId) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const response = await axios.post('http://localhost:4000/userSessionCheck', {
+                    userId: userId
+                });
+                resolve(response.data);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
 }
 
 export default new ChatHttpServer();

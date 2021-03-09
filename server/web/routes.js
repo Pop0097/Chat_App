@@ -9,5 +9,7 @@ const router = express.Router();
 
 router.post('/register', routeHandler.registerRouteHandler);
 router.post('/usernameAvailable', routeHandler.userNameCheckHandler);
+router.post('/login', routeHandler.loginRouteHandler);
+router.post('/userSessionCheck', routeHandler.userSessionCheckRouteHandler);
 
 module.exports = router;
