@@ -19,7 +19,6 @@ function App() {
           <Route component={NotFound} />
         </Switch>
       </Router>
-      <p>Loaded App</p> 
     </div>
   );
 }

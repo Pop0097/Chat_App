@@ -31,6 +31,10 @@ mongoClient.connect((err, client) => {
 
 /*** DATABSE CONNECTION ENDS ***/
 
+/*
+    We create async functions since we will need to use try catch statements and sometimes
+    wait for the database to respond
+*/
 registerRouteHandler = async (req, res) => {
     // Create a structure with the passed in data
     const data = {
@@ -41,7 +45,7 @@ registerRouteHandler = async (req, res) => {
     try {
         // First check if inputted data is valid. If not, then end process
         if ('' === data.username) {
-            res.status(CONSTANTS.SERVER_ERROR_HTTP_CODE).json({
+            return res.status(CONSTANTS.SERVER_ERROR_HTTP_CODE).json({
                 error: true,
                 message: CONSTANTS.USERNAME_NOT_FOUND
             });
@@ -60,7 +64,7 @@ registerRouteHandler = async (req, res) => {
 
             data.password = passwordHash.createHash(data.password);
 
-            const inserted = db.collection('users').insert(data);
+            const inserted = db.collection('users').insert(data); // Insert user in our collection
 
             res.status(CONSTANTS.SERVER_OK_HTTP_CODE).json({
                 error: false,
@@ -87,17 +91,19 @@ userNameCheckHandler = async (req, res) => {
                 message: CONSTANTS.USERNAME_NOT_FOUND
             });
         } else {
+            // Use await clause so we only continue on if this process has completed
             const count = await db.collection('users').find({ username : username }).count();
-            // console.log(count);
+            
+            // console.log(count); // Debugging
     
             // Returns error if exists
-            if (count === 0) {   
-                res.status(200).json({
+            if (count == 0) {   
+                res.json({
                     error: false,
                     message: CONSTANTS.USERNAME_AVAILABLE_OK
                 });
             } else {
-                res.status(200).json({
+                res.json({
                     error: true,
                     message: CONSTANTS.USERNAME_AVAILABLE_FAILED
                 });
