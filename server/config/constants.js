@@ -13,8 +13,8 @@ module.exports.SELECT_USER = `Select a user to chat.`;
 
 /* General Errors  constants start */
 module.exports.MESSAGE_STORE_ERROR =`Could not store messages, server error.`;
-module.exports.ROUTE_NOT_FOUND = `You are at wrong place. Shhoooo...`;
-module.exports.SERVER_ERROR_MESSAGE = `Something bad happend. It's not you, it's me.`;
+module.exports.ROUTE_NOT_FOUND = `Route not found`;
+module.exports.SERVER_ERROR_MESSAGE = `Server request broke :((`;
 
 /* HTTP status code constant starts */
 module.exports.SERVER_ERROR_HTTP_CODE = 412;

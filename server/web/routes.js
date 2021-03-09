@@ -8,5 +8,6 @@ const express = require('express');
 const router = express.Router();
 
 router.post('/register', routeHandler.registerRouteHandler);
+router.post('/usernameAvailable', routeHandler.userNameCheckHandler);
 
 module.exports = router;

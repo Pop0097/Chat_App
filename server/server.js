@@ -7,12 +7,11 @@
 const express = require('express'); 
 const http = require('http');
 const socketio = require('socket.io'); // Required for real-time chat communication
-const mongoose = require('mongoose');
-
 
 const socketEvents = require('./web/socket');
 const routes = require('./web/routes');
 const appConfig = require('./config/app-config');
+const { throws } = require('assert');
 
 class Server {
 
@@ -20,19 +19,8 @@ class Server {
         this.app = express(); 
         this.http = http.Server(this.app); // Uses an HTTP server
         this.socket = socketio(this.http); // We communicate with Socketio using our http server
-    }
+        this.message = "Hello";
 
-    appConfig() {
-        new appConfig(this.app).includeConfig();
-    }
-
-    includesRoutes() {
-        this.app.use('/', routes);
-    
-        // new socketEvents(this.app).socketConfig();
-    }
-
-    appExecute() {
         // Include our app config and routes
         this.appConfig();
         this.includesRoutes();
@@ -45,20 +33,21 @@ class Server {
         this.http.listen(port, host, () => {
             console.log(`listening on http://${host}:${port}`);
         });
-
-        // Connect to our database
-        this.uri = process.env.ATLAS_URI;
-
-        mongoose.connect(this.uri, { useNewUrlParser: true, useCreateIndex: true });
-
-        this.connection = mongoose.connection;
-
-        this.connection.once('open', () => {
-            console.log('MongoDB database connection established successfully');
-        });
     }
+
+    appConfig() {
+        new appConfig(this.app).includeConfig();
+    }
+
+    includesRoutes() {
+        this.app.use('/', routes);
+    
+        // new socketEvents(this.app).socketConfig();
+    }
+
 }
 
-const app = new Server(); // Creates new server object
-app.appExecute(); // Starts the application
+const app = new Server();
+
+module.exports = app; // Creates new server object
 

@@ -1,27 +1,69 @@
-// /*
-//     Files handles queries with the database
-// */
+const dataBase = require('../config/db');
+const CONSTANTS = require('../config/constants');
 
-// const DefinedSchemas = require('../config/schema');
-// const User = DefinedSchemas.userModel;
+const DefinedSchemas = require('../config/models');
+const User = DefinedSchemas.userModel;
 
-// registerUser = (data) => {
-//     const username = data.username;
-//     const pwd = data.password; 
+registerUser = async (data) => {
 
-//     const newUser = new User(username, pwd);
+    try {
+        const username = data.username;
+        const password = data.password; 
 
-//     if (!newUser) {
-//         reject(err);
-//     }
+        const newUser = new User({username, password});
 
-//     // Saves new user to the database
-//     newUser.save()
-//         .then(() => resolve(result))
-//         .catch(() => console.log("Failed to add user"));
-// }
+        if (!newUser) {
+            return {
+                error: true,
+                message: 'Could not create movie'
+            };
+        }
 
-// module.exports = {
-//     registerUser,
-// }
+        await dataBase.client.connect();
+        console.log("Connected to server");
 
+        const db = dataBase.client.db(dataBase.dbName);
+
+        console.log("Inserting Data");
+
+        db.collection('users').insertOne(newUser);
+    } catch (err) {
+        return {
+            error : true,
+            message : CONSTANTS.SERVER_ERROR_MESSAGE,
+            errorMessage: err
+        };
+    }
+}
+
+checkInstanceNumber = async (data) => {
+    try {
+        await dataBase.client.connect();
+
+        console.log("Connected to server");
+
+        const db = dataBase.client.db(dataBase.dbName);
+
+        console.log("Fetching Data");
+
+        db.collection('users').find(data).count((err, result) => {
+            if (err) {
+                console.log("Fetching broke");
+            }
+            console.log("Got data: " + result);
+            return result;
+        });
+
+    } catch (err) {
+        return {
+            error : true,
+            message : CONSTANTS.SERVER_ERROR_MESSAGE,
+            errorMessage: err
+        };
+    }
+}
+
+module.exports = {
+    registerUser,
+    checkInstanceNumber,
+}
