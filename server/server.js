@@ -41,10 +41,8 @@ class Server {
 
     includesRoutes() {
         this.app.use('/', routes);
-    
-        // new socketEvents(this.app).socketConfig();
+        new socketEvents(this.socket).socketConfig();
     }
-
 }
 
 const app = new Server();
