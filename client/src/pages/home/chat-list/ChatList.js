@@ -28,30 +28,53 @@ export default class ChatList extends Component {
     }
     
     createChatListUsers = (chatListResponse) => {    
-        // console.log("Create chat list users");
+        console.log(chatListResponse);
 
         if (!chatListResponse.error) { // Success
             let chatListUsers = this.state.chatListUsers; // Lists all users
 
             if (chatListResponse.singleUser) { // If a user logs in
+                // console.log("single user" + " " + chatListUsers.length);
 
-                if (chatListUsers.length > 0) {
-                    chatListUsers = chatListUsers.filter(function (obj) {
-                        return obj.id !== chatListResponse.chatList[0].id;
-                    });
+                // Prevents the websocket from pasting the current user many times
+                if (chatListResponse.chatList[0].id === this.props.userId) {
+                    console.log("Current user");
+                    return;
                 }
-                /* Adding new online user into chat list array */
-                chatListUsers = [...chatListUsers, ...chatListResponse.chatList];
 
+                let found = false;
+                
+                // If logged in user already present, just change their status
+                for (var i = 0; i < chatListUsers.length && !found; i++) { 
+                    console.log(this.state.chatListUsers[i].username + " " + chatListResponse.chatList[0].username);
+                    if (chatListUsers[i].username === chatListResponse.chatList[0].username) {
+                        found = true;
+                        chatListUsers[i].online = chatListResponse.chatList[0].online;
+                    }
+                }
+                
+                // If logged in user isn't present, append them to the array
+                if (!found) {
+                    // console.log("Adding new user");
+                    chatListUsers = [...chatListUsers, ...chatListResponse.chatList];
+                }
             } else if (chatListResponse.userDisconnected) { // If a user has logged out
 
-                const loggedOutUser = chatListUsers.findIndex((obj) => obj.id === chatListResponse.userid);
+                // console.log("Disconnected");
 
-                if (loggedOutUser >= 0) {
-                    chatListUsers[loggedOutUser].online = 'N';
+                let found = false;
+                
+                // Sees if removed user is already present in list. If they are, don't add a new one
+                for (var i = 0; i < chatListUsers.length && !found; i++) {
+                    if (chatListUsers[i]._id === chatListResponse.userid) {
+                        found = true;
+                        chatListUsers[i].online = 'N';
+                    }
                 }
 
             } else {
+                // console.log("General");
+
                 /* Updating entire chat list if user logs in. */
                 chatListUsers = chatListResponse.chatList;
             }
@@ -81,7 +104,7 @@ export default class ChatList extends Component {
             <>
                 <ul className={`user-list ${this.state.chatListUsers.length === 0 ? 'visibility-hidden' : ''}`} >
                     {
-                        this.state.chatListUsers.map( (user, index) => 
+                        this.state.chatListUsers.map((user, index) => 
                             <li 
                             key={index} 
                             className={this.state.selectedUserUsername === user.username ? 'active' : ''}
