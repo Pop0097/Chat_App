@@ -32,6 +32,7 @@ mongoClient.connect((err, client) => {
 // Some processes require promises to ensure that they go through properly
 // Such processes are defined here
 
+// Creates a new user document with the given data
 registerUser = (data) => {
     return new Promise( async (resolve, reject) => {
         try {
@@ -47,6 +48,7 @@ registerUser = (data) => {
     });
 }
 
+// Checks if the inputted username is unique
 userNameCheck = (data) => {
     return new Promise( async (resolve, reject) => {
         try {
@@ -62,6 +64,7 @@ userNameCheck = (data) => {
     });
 }
 
+// Gets a user's document using their unique username 
 getUserByUsername = (username) => {
     return new Promise( async (resolve, reject) => {
         try {
@@ -78,6 +81,7 @@ getUserByUsername = (username) => {
     });
 }
 
+// Makes the user's online status to "online"
 makeUserOnline = (userId) => {
     return new Promise( async (resolve, reject) => {
         try {
@@ -97,6 +101,7 @@ makeUserOnline = (userId) => {
     });
 }
 
+// Checks if user is logged in
 userSessionCheck = (data) => {
     return new Promise( async (resolve, reject) => {
         try {
@@ -113,6 +118,7 @@ userSessionCheck = (data) => {
     });
 }
 
+// Adds a socketId to the user's document
 addSocketId = ({userId, socketId}) => {
     const data = {
         id : userId,
@@ -124,7 +130,7 @@ addSocketId = ({userId, socketId}) => {
         }
     };
 
-    console.log(userId + " " + socketId);
+    // console.log(userId + " " + socketId);
 
     return new Promise( async (resolve, reject) => {
         try {
@@ -141,13 +147,15 @@ addSocketId = ({userId, socketId}) => {
 
 }
 
+// Gets the user's information using either their socketId or other identifying information
 getUserInfo = ({userId, socketId = false}) => {
     let queryProjection = null;
-    if (socketId) {
+
+    if (socketId) { // Socket for the user stores all of their session information, so if we have that we could just look for that
         queryProjection = {
             "socketId": true,
         }
-    } else {
+    } else { // If user does not have a socket instance, then we look with these parameters
         queryProjection = {
             "username": true,
             "online": true,
@@ -160,16 +168,16 @@ getUserInfo = ({userId, socketId = false}) => {
         try {
             db.collection('users').aggregate([{
                 $match: { // Find all users that match this condition
-                    _id : ObjectID(userId),
+                    _id : ObjectID(userId), 
                 }
             }, {
-                $project: queryProjection,
-            }]).toArray( (err, result) => {
+                $project: queryProjection, // Ensure found documents have the specified fields initialized
+            }]).toArray((err, result) => { // Convert result into an array
                 if (err) {
                     reject(err);
                 }
                 
-                socketId ? resolve(result[0]['socketId']) : resolve(result);
+                socketId ? resolve(result[0]['socketId']) : resolve(result); // Sends socket ID if defined, else send entire document
             })
         } catch (err) {
             reject(err);
@@ -177,24 +185,41 @@ getUserInfo = ({userId, socketId = false}) => {
     });
 }
 
+// Gets all users who are not the current user
 getChatList = (userId) => {
     return new Promise( async (resolve, reject) => {
         try {
             db.collection('users').aggregate([{
                 $match: { // Find all users that match this condition
-                    'socketId': {$ne : userId }
+                    '_id': { $ne : ObjectID(userId) }
                 }
-            }, {
-                $project: {
-                    "username" : true,
-                    "online" : true,
-                    "_id" : false,
-                    "id" :'$id',
-                }
-            }]).toArray( (err, result) => {
+            }]).toArray((err, result) => {
                 if (err) {
                     reject(err);
                 }
+                resolve(result);
+            })
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+logout = (userId) => {
+
+    const data = {
+        $set : {
+            'online' : 'N',
+        }
+    }
+
+    return new Promise (async (resolve, reject) => {
+        try {
+            db.collection('users').updateOne({ _id : ObjectID(userId) }, data, (err, result) => {
+                if (err) {
+                    reject(err);
+                }
+
                 resolve(result);
             })
         } catch (err) {
@@ -214,4 +239,5 @@ module.exports = {
     addSocketId,
     getUserInfo,
     getChatList,
+    logout,
 };

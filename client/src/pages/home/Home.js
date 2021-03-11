@@ -41,8 +41,8 @@ class Home extends Component {
                     name: response.name,
                 });
 
-                ChatHttpServer.setLS('username', response.username);
-                ChatSocketServer.establishSocketConnection(this.userId);
+                await ChatHttpServer.setLS('username', response.username);
+                await ChatSocketServer.establishSocketConnection(this.userId);
             }
 
             this.setRenderLoadingState(false);
@@ -52,8 +52,32 @@ class Home extends Component {
         }
     }
 
+    // Sets the user that is selected in our ChatList 
+    updateSelectedUser = (user) => {
+        // console.log(user.username);
+        this.setState({
+            selectedUser : user,
+        });
+    }
+
     getChatListComponent() {
         return this.state.isOverlayVisible ? null : <ChatList userId={this.userId} updateSelectedUser={this.updateSelectedUser}/>
+    }
+
+    logout = async () => {
+        try {
+            await ChatHttpServer.removeLS();
+            // alert(this.userId);
+            ChatSocketServer.logout({ userId: this.userId });
+            ChatSocketServer.eventEmitter.on('logout-response', (loggedOut) => {
+                // console.log("Here");
+                this.props.history.push('/');
+            });
+        } catch (err) {
+            console.log(err);
+            alert('Error logging out.');
+            throw err;
+        }
     }
 
     render() {

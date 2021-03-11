@@ -18,7 +18,7 @@ class Server {
     constructor() {
         this.app = express(); 
         this.http = http.Server(this.app); // Uses an HTTP server
-        this.socket = socketio(this.http); // We communicate with Socketio using our http server
+        this.socket = socketio(this.http); // Initializes a socketio instance
         this.message = "Hello";
 
         // Include our app config and routes
@@ -41,7 +41,7 @@ class Server {
 
     includesRoutes() {
         this.app.use('/', routes);
-        new socketEvents(this.socket).socketConfig();
+        new socketEvents(this.socket).socketConfig(); // Initializes our Socket class so we can access socketio functionality
     }
 }
 

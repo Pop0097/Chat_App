@@ -43,6 +43,19 @@ class ChatHttpServer {
         });
     }
 
+    // Removes all items in our browser session storage
+    removeLS() {
+        return new Promise((resolve, reject) => {
+            try {
+                localStorage.removeItem('userId');
+                localStorage.removeItem('username');
+                resolve(true);
+            } catch (err) {
+                reject(err);
+            }
+        })
+    }
+
     login(userCredential) {
         return new Promise(async (resolve, reject) => {
             try {
@@ -76,6 +89,8 @@ class ChatHttpServer {
             }
         });
     }
+
+
 }
 
 export default new ChatHttpServer();

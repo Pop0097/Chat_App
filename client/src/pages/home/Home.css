@@ -6,6 +6,7 @@
 
 .app-header nav {
     float: left;
+    text-transform: capitalize;
 }
 
 .content {

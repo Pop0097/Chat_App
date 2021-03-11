@@ -10,7 +10,7 @@ export default class ChatList extends Component {
 
         this.state = {
             loading: true,
-            selectedUserId: null,
+            selectedUserUsername: null,
             chatListUsers: [],
         };
 
@@ -20,7 +20,7 @@ export default class ChatList extends Component {
     componentDidMount() {
         const userId = this.props.userId;
         ChatSocketServer.getChatList(userId); // Update the list of the user 
-        ChatSocketServer.eventEmitter.on('chat-list-response', this.createChatListUsers);
+        ChatSocketServer.eventEmitter.on('chat-list-response', this.createChatListUsers); // When chat-list-response is triggered, we run createChatListUsers
     }
 
     componentWillUnmount() {
@@ -28,9 +28,9 @@ export default class ChatList extends Component {
     }
     
     createChatListUsers = (chatListResponse) => {    
-        console.log("Create chat list users");
-        // Success
-        if (!chatListResponse.error) {
+        // console.log("Create chat list users");
+
+        if (!chatListResponse.error) { // Success
             let chatListUsers = this.state.chatListUsers; // Lists all users
 
             if (chatListResponse.singleUser) { // If a user logs in
@@ -70,7 +70,7 @@ export default class ChatList extends Component {
 
     selectedUser = (user) => {
         this.setState({
-            selectedUserId: user.id
+            selectedUserUsername: user.username
         });
 
         this.props.updateSelectedUser(user)
@@ -84,7 +84,7 @@ export default class ChatList extends Component {
                         this.state.chatListUsers.map( (user, index) => 
                             <li 
                             key={index} 
-                            className={this.state.selectedUserId === user.id ? 'active' : ''}
+                            className={this.state.selectedUserUsername === user.username ? 'active' : ''}
                             onClick={() => this.selectedUser(user)}
                             >
                                 {user.username}
