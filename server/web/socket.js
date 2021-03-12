@@ -107,6 +107,42 @@ class Socket {
 				}
 			});
 
+			socket.on('add-message', async (data) => {
+				try {
+					if (data.message === '') {
+						this.io.to(socket.id).emit('add-message-response', {
+							error: true,
+							message: CONSANTS.MESSAGE_NOT_FOUND,
+						});
+					} else if (data.fromUserId === '') {
+						this.io.to(socket.id).emit(`add-message-response`,{
+							error : true,
+							message: CONSANTS.SERVER_ERROR_MESSAGE
+						}); 	
+					} else if (data.toUserId === '') {
+						this.io.to(socket.id).emit(`add-message-response`,{
+							error : true,
+							message: CONSANTS.SELECT_USER
+						}); 
+					} 
+
+					const [toSocketId, messageResult] = await Promise.all([
+						queryHandler.getUserInfo({
+							userId: data.toUserId,
+							socketId: false
+						}),
+						queryHandler.insertMessages(data)	
+					]);
+
+					this.io.to(socket.id).emit('add-message-response', data);
+
+				} catch (err) {
+					this.io.to(socket.id).emit('add-message-response', {
+						error: true,
+						message: CONSANTS.MESSAGE_STORE_ERROR,
+					});
+				}
+			});
         });
     }
 

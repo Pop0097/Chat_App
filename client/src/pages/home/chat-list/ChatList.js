@@ -96,7 +96,7 @@ export default class ChatList extends Component {
             selectedUserUsername: user.username
         });
 
-        this.props.updateSelectedUser(user)
+        this.props.updateSelectedUser(user); // Send data to home.js
     }
 
     render() {

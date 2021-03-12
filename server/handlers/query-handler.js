@@ -228,6 +228,61 @@ logout = (userId) => {
     });
 }
 
+getMessages = ({userId, toUserId}) => {
+    const data = {
+        '$or': [ // Satisfies either condition
+            { 
+                '$and': [
+                    {
+                        'toUserId': userId
+                    },
+                    {
+                        'fromUserId': toUserId
+                    }
+                ]
+            },{
+                '$and': [ // Satisfies both conditions
+                    {
+                        'toUserId': toUserId
+                    },
+                    {
+                        'fromUserId': userId
+                    }
+                ]
+            }
+        ]
+    }
+
+    return new Promise (async (resolve, reject) => {
+        try {
+            db.collection('messages').find(data).sort({'timestamp':1})
+                .toArray((err, result) => {
+                    if (err) {
+                        reject(err);
+                    }
+                    resolve(result);
+                })
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+insertMessages = (messagePacket) => {
+    return new Promise( async (resolve, reject) => {
+        try {
+            db.collection('messages').insertOne(messagePacket, (err, result) =>{
+                if( err ){
+                    reject(err);
+                }
+                resolve(result);
+            });
+        } catch (error) {
+            reject(error)
+        }
+    });
+}
+
 /*** HELPERS END ***/
 
 module.exports = {
@@ -240,4 +295,5 @@ module.exports = {
     getUserInfo,
     getChatList,
     logout,
+    insertMessages,
 };

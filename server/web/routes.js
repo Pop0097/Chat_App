@@ -11,5 +11,6 @@ router.post('/register', routeHandler.registerRouteHandler);
 router.post('/usernameAvailable', routeHandler.userNameCheckHandler);
 router.post('/login', routeHandler.loginRouteHandler);
 router.post('/userSessionCheck', routeHandler.userSessionCheckRouteHandler);
+router.get('/getMessages', routeHandler.getMessagesRouteHandler);
 
 module.exports = router;

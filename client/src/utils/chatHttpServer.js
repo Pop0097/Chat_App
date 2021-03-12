@@ -90,7 +90,19 @@ class ChatHttpServer {
         });
     }
 
-
+    getMessages(userId, toUserId) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                const response = await axios.get('http://localhost:4000/getMessages', {
+                    userId: userId,
+                    toUserId: toUserId
+                });
+                resolve(response.data);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }
 }
 
 export default new ChatHttpServer();

@@ -73,8 +73,6 @@ userNameCheckHandler = async (req, res) => {
         } else {
             // Use await clause so we only continue on if this process has completed
             const count = await queryHandler.userNameCheck({ username : username });
-            
-            // console.log(count); // Debugging
     
             // Returns error if exists
             if (count == 0) {   
@@ -183,7 +181,35 @@ userSessionCheckRouteHandler = async (req, res) => {
             errorMessage: err,
         });
     }
+}
+
+getMessagesRouteHandler = async (req, res) => {
+    let userId = req.body.userId;
+    let toUserId = req.body.toUserId;
     
+    try {
+        if (userId == '') {
+            res.status(CONSTANTS.SERVER_ERROR_HTTP_CODE).json({
+                error: true,
+                message: CONSTANTS.USERID_NOT_FOUND,
+            });
+        }
+
+        const messagesResponse = await queryHandler.getMessages({
+            userId: userId,
+            toUserId: toUserId,
+        });
+
+        res.status(CONSTANTS.SERVER_OK_HTTP_CODE).json({
+            error: false,
+            messages: messagesResponse,
+        });
+    } catch (err) {
+        res.status(CONSTANTS.SERVER_NOT_ALLOWED_HTTP_CODE).json({
+            error: true,
+            messages: CONSTANTS.USER_NOT_LOGGED_IN,
+        })
+    }
 }
 
 module.exports = {
@@ -191,4 +217,5 @@ module.exports = {
     userNameCheckHandler,
     loginRouteHandler,
     userSessionCheckRouteHandler,
+    getMessagesRouteHandler,
 }

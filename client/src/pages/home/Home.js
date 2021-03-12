@@ -5,6 +5,7 @@ import ChatHttpServer from '../../utils/chatHttpServer';
 import ChatSocketServer from '../../utils/chatSocketServer';
 
 import ChatList from './chat-list/ChatList';
+import Conversation from './conversation/Conversation';
 
 import './Home.css';
 
@@ -64,6 +65,10 @@ class Home extends Component {
         return this.state.isOverlayVisible ? null : <ChatList userId={this.userId} updateSelectedUser={this.updateSelectedUser}/>
     }
 
+    getChatBoxComponent() {
+        return this.state.isOverlayVisible ? null : <Conversation userId={this.userId} newSelectedUser={this.state.selectedUser}/>
+    }
+
     logout = async () => {
         try {
             await ChatHttpServer.removeLS();
@@ -105,6 +110,7 @@ class Home extends Component {
                             {this.getChatListComponent()}
                         </div>
                         <div className="col-8 message-container">
+                            {this.getChatBoxComponent()}
                         </div>
                     </div>
                 </main>
