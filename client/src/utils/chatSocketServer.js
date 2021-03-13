@@ -53,7 +53,7 @@ class ChatSocketServer {
 
     logout(userId) {
         this.socket.emit('logout', userId);
-        
+
         this.socket.on('logout-response', (data) => {
             this.eventEmitter.emit('logout-response', data); // Sends data to client
         })
@@ -63,6 +63,12 @@ class ChatSocketServer {
         this.socket.emit('add-message', message); // Only one way communication, not waiting for response
     }
 
+    // One way communication for receiving data
+    receiveMessage() {
+        this.socket.on('add-message-response', (data) => {
+            this.eventEmitter.emit('add-message-response', data);
+        });
+    }
 }
 
 export default new ChatSocketServer();

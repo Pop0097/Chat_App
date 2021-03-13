@@ -93,7 +93,7 @@ class ChatHttpServer {
     getMessages(userId, toUserId) {
         return new Promise(async (resolve, reject) => {
             try {
-                const response = await axios.get('http://localhost:4000/getMessages', {
+                const response = await axios.post('http://localhost:4000/getMessages', {
                     userId: userId,
                     toUserId: toUserId
                 });

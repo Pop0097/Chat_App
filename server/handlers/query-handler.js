@@ -22,7 +22,7 @@ mongoClient.connect((err, client) => {
     }
 
     db = client.db(process.env.MONGO_DBNAME);
-    console.log("Successfully connected to database");
+    // console.log("Successfully connected to database");
 });
 
 /*** DATABSE CONNECTION ENDS ***/
@@ -130,7 +130,7 @@ addSocketId = ({userId, socketId}) => {
         }
     };
 
-    // console.log(userId + " " + socketId);
+    // // console.log(userId + " " + socketId);
 
     return new Promise( async (resolve, reject) => {
         try {
@@ -230,33 +230,33 @@ logout = (userId) => {
 
 getMessages = ({userId, toUserId}) => {
     const data = {
-        '$or': [ // Satisfies either condition
-            { 
-                '$and': [
-                    {
-                        'toUserId': userId
-                    },
-                    {
-                        'fromUserId': toUserId
-                    }
+        '$or' : [
+            { '$and': [
+                {
+                    'toUserId': userId
+                },{
+                    'fromUserId': toUserId
+                }
+            ]
+        },{
+            '$and': [ 
+                {
+                    'toUserId': toUserId
+                }, {
+                    'fromUserId': userId
+                }
                 ]
-            },{
-                '$and': [ // Satisfies both conditions
-                    {
-                        'toUserId': toUserId
-                    },
-                    {
-                        'fromUserId': userId
-                    }
-                ]
-            }
+            },
         ]
-    }
+    };
+
+    // console.log(data);
 
     return new Promise (async (resolve, reject) => {
         try {
             db.collection('messages').find(data).sort({'timestamp':1})
                 .toArray((err, result) => {
+                    // console.log(result);
                     if (err) {
                         reject(err);
                     }
@@ -275,6 +275,7 @@ insertMessages = (messagePacket) => {
                 if( err ){
                     reject(err);
                 }
+                // console.log("Adddd message");
                 resolve(result);
             });
         } catch (error) {
@@ -296,4 +297,5 @@ module.exports = {
     getChatList,
     logout,
     insertMessages,
+    getMessages,
 };

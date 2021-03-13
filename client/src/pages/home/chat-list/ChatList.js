@@ -28,7 +28,7 @@ export default class ChatList extends Component {
     }
     
     createChatListUsers = (chatListResponse) => {    
-        console.log(chatListResponse);
+        // console.log(chatListResponse);
 
         if (!chatListResponse.error) { // Success
             let chatListUsers = this.state.chatListUsers; // Lists all users
@@ -38,7 +38,7 @@ export default class ChatList extends Component {
 
                 // Prevents the websocket from pasting the current user many times
                 if (chatListResponse.chatList[0].id === this.props.userId) {
-                    console.log("Current user");
+                    // console.log("Current user");
                     return;
                 }
 
@@ -46,7 +46,7 @@ export default class ChatList extends Component {
                 
                 // If logged in user already present, just change their status
                 for (var i = 0; i < chatListUsers.length && !found; i++) { 
-                    console.log(this.state.chatListUsers[i].username + " " + chatListResponse.chatList[0].username);
+                    // console.log(this.state.chatListUsers[i].username + " " + chatListResponse.chatList[0].username);
                     if (chatListUsers[i].username === chatListResponse.chatList[0].username) {
                         found = true;
                         chatListUsers[i].online = chatListResponse.chatList[0].online;

@@ -42,9 +42,9 @@ registerRouteHandler = async (req, res) => {
 
             const result = await queryHandler.registerUser(data); // Insert user in our collection
 
-            // console.log(result);
-            // console.log(result._id);
-            // console.log(result.ops[0]._id);
+            // // console.log(result);
+            // // console.log(result._id);
+            // // console.log(result.ops[0]._id);
 
             res.status(CONSTANTS.SERVER_OK_HTTP_CODE).json({
                 error: false,
@@ -125,7 +125,7 @@ loginRouteHandler = async (req, res) => {
             } else {
 
                 if (passwordHash.compareHash(data.password, result.password)) {
-                    console.log("Changing User state");
+                    // console.log("Changing User state");
 
                     await queryHandler.makeUserOnline(result._id);
 
@@ -136,7 +136,7 @@ loginRouteHandler = async (req, res) => {
                     });
 
                 } else {
-                    console.log("Not found");
+                    // console.log("Not found");
                     res.status(CONSTANTS.SERVER_NOT_FOUND_HTTP_CODE).json({
                         error : true,
                         message : CONSTANTS.USER_LOGIN_FAILED
@@ -145,7 +145,7 @@ loginRouteHandler = async (req, res) => {
             }
         }
     } catch (err) {
-        console.log("Oopsies");
+        // console.log("Oopsies");
         res.status(CONSTANTS.SERVER_ERROR_HTTP_CODE).json({
             error: true,
             message: CONSTANTS.SERVER_ERROR_MESSAGE,
@@ -166,7 +166,7 @@ userSessionCheckRouteHandler = async (req, res) => {
         } else {
             const result = await queryHandler.userSessionCheck({ userId : userId});
 
-            // console.log(result.username);
+            // // console.log(result.username);
 
             res.status(CONSTANTS.SERVER_OK_HTTP_CODE).json({
                 error : false,
@@ -186,6 +186,8 @@ userSessionCheckRouteHandler = async (req, res) => {
 getMessagesRouteHandler = async (req, res) => {
     let userId = req.body.userId;
     let toUserId = req.body.toUserId;
+
+    // console.log(userId + " " + toUserId);
     
     try {
         if (userId == '') {
@@ -195,16 +197,22 @@ getMessagesRouteHandler = async (req, res) => {
             });
         }
 
+        // console.log("Calling query");
+
         const messagesResponse = await queryHandler.getMessages({
             userId: userId,
             toUserId: toUserId,
         });
+
+        // console.log("got messages ");
+        // console.log(messagesResponse);
 
         res.status(CONSTANTS.SERVER_OK_HTTP_CODE).json({
             error: false,
             messages: messagesResponse,
         });
     } catch (err) {
+        // console.log(err);
         res.status(CONSTANTS.SERVER_NOT_ALLOWED_HTTP_CODE).json({
             error: true,
             messages: CONSTANTS.USER_NOT_LOGGED_IN,

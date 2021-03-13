@@ -17,6 +17,7 @@ export default class Conversation extends Component {
         };
 
         this.messageContainer = createRef();
+        this.receiveSocketMessages = this.receiveSocketMessages.bind(this);
     }
 
     // Update our state with the data of the selected user
@@ -33,15 +34,36 @@ export default class Conversation extends Component {
     componentDidUpdate(prevProps) {
         // Have we selected a user different to that which is displayed in the current Conversation component?
         // This runs after our component's state has updated (or when we have picked a new user in our chat list)
-        if (prevProps.newSelectedUser === null || (this.props.newSelectedUser.id !== prevProps.newSelectedUser.id)) {
+
+        if (prevProps.newSelectedUser === null || (this.props.newSelectedUser._id !== prevProps.newSelectedUser._id)) {
+            // console.log("Selected a new user");
+           
+            this.setSelectedUser(this.props.newSelectedUser);
+
             this.getMessages();
         }      
+    }
+
+    setSelectedUser = (user) => {
+        this.setState({
+            selectedUser: user,
+        });
+    }
+
+    componentDidMount() {
+        // console.log(this.state.selectedUser);
+        ChatSocketServer.receiveMessage();
+        ChatSocketServer.eventEmitter.on('add-message-response', this.receiveSocketMessages);
+    }
+
+    componentWillUnmount() {
+        ChatSocketServer.eventEmitter.removeListener('add-message-response', this.receiveSocketMessages);
     }
 
     getMessages = async () => {
         try {
             const { userId, newSelectedUser } = this.props;
-            const messageResponse = await ChatHttpServer.getMessages(userId, newSelectedUser.id);
+            const messageResponse = await ChatHttpServer.getMessages(userId, newSelectedUser._id);
 
             if (!messageResponse.error) {
                 this.setState({
@@ -107,7 +129,8 @@ export default class Conversation extends Component {
             } else if (newSelectedUser === undefined) {
                 alert('Select a user to chat.');
             } else { // If all checks pass, we will call function to send the message!
-                console.log(newSelectedUser._id);
+                // console.log(newSelectedUser._id);
+                
                 this.sendAndUpdateMessages({
                     fromUserId: userId,
                     message: (message).trim(),
@@ -121,15 +144,15 @@ export default class Conversation extends Component {
     
     sendAndUpdateMessages(message) {
         try {
-            console.log(message);
+            // console.log(message);
             // Send message through websocket
             ChatSocketServer.sendMessage(message);
-            console.log("Here");
+            // console.log("Here");
             // Updagte messages by tacking our new message onto the end of the array
             this.setState({
                 conversations : [...this.state.conversations, message]
             });
-            console.log(this.state.conversations);
+            // console.log(this.state.conversations);
 
             // Scrolls message container so we are at the bottom of our messages list constantly
             this.scrollMessageContainer();
@@ -145,12 +168,26 @@ export default class Conversation extends Component {
                     this.messageContainer.current.scrollTop = this.messageContainer.current.scrollHeight;
                 }, 100);
             } catch (error) {
-                console.log(error);
+                // console.log(error);
             }
         }
     }
-    
-    
+
+    receiveSocketMessages = (socketResponse) => {
+        const { selectedUser } = this.state;
+
+        // console.log(socketResponse);
+        // console.log(this.state);
+        // console.log(selectedUser);
+
+        if (selectedUser !== null && selectedUser._id === socketResponse.fromUserId) {
+            this.setState({
+                conversations: [...this.state.conversations, socketResponse]
+            });
+
+            this.scrollMessageContainer();
+        }
+    }
 
     render() {
         const { messageLoading, selectedUser } = this.state;

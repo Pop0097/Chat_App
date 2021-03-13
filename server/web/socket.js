@@ -97,7 +97,7 @@ class Socket {
 						userid : userId
 					});
 				} catch (err) {
-					console.log(err);
+					// console.log(err);
 
 					this.io.to(socket.id).emit(`logout-response`, {
 						error : true,
@@ -108,6 +108,7 @@ class Socket {
 			});
 
 			socket.on('add-message', async (data) => {
+
 				try {
 					if (data.message === '') {
 						this.io.to(socket.id).emit('add-message-response', {
@@ -126,17 +127,22 @@ class Socket {
 						}); 
 					} 
 
-					const [toSocketId, messageResult] = await Promise.all([
+					const [ toSocketId, messageResult ] = await Promise.all([
 						queryHandler.getUserInfo({
 							userId: data.toUserId,
-							socketId: false
+							socketId: true
 						}),
+
 						queryHandler.insertMessages(data)	
 					]);
+					
+					// console.log("Here " + toSocketId);
+					// console.log(data);
 
-					this.io.to(socket.id).emit('add-message-response', data);
+					this.io.to(toSocketId).emit('add-message-response', data);
 
 				} catch (err) {
+					// console.log(err);
 					this.io.to(socket.id).emit('add-message-response', {
 						error: true,
 						message: CONSANTS.MESSAGE_STORE_ERROR,
@@ -147,7 +153,7 @@ class Socket {
     }
 
     socketConfig() {
-        console.log("Configuring Socket");
+        // console.log("Configuring Socket");
         
         this.io.use( async (socket, next) => {
             try {
@@ -158,7 +164,7 @@ class Socket {
 				});
 				next();
             } catch (err) {
-                console.log("SocketConfig Error: " + err);
+                // console.log("SocketConfig Error: " + err);
             }
         });
         this.socketEvents();
